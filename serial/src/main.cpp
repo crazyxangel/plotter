@@ -6,6 +6,11 @@ int ten;
 int hundred;
 int start = 47;
 int number;
+int xsteps;
+int ysteps;
+int xchar = 120;
+int ychar = 121;
+int xory;
 void setup()
 {
   Serial.begin(115200);
@@ -20,7 +25,7 @@ void loop()
   {
     if(Serial.read() == start)
     {
-      for (int i = 0; i < 3; i++)
+      for (int i = 0; i < 4; i++)
       {
         delay(1);
         switch (i)
@@ -34,21 +39,23 @@ void loop()
         case 2:
           one = Serial.read();
           break;
-        
+        case 3:
+        xory = Serial.read();
+          if (xory == xchar)
+            xsteps = (hundred - 48) * 100 + (ten - 48) * 10 + one - 48;
+          if (xory == ychar)
+            ysteps = (hundred - 48) * 100 + (ten - 48) * 10 + one - 48;
         default:
           break;
         }
       }
     }
     number = (hundred -48)*100 + (ten -48)*10 + one-48;
-    if(number == 123)
+    if(xsteps == 321 && ysteps == 123)
     {
       PORTD = 1 << led;
       Serial.write('S');
     }
-    if(number == 321)
-    {
-      PORTD = 0;
-    }
+
    }
 }

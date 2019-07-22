@@ -5,6 +5,7 @@ ser = serial.Serial("COM17",115200,timeout = 0)
 while True:
     inputstring = input()
     ser.write(inputstring.encode())
+    
     if 'S' in str(ser.readline()):
         print("banana")
     
