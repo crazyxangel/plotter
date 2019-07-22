@@ -54,7 +54,7 @@ void loop()
     if(xsteps == 321 && ysteps == 123)
     {
       PORTD = 1 << led;
-      Serial.write('S');
+      Serial.write("396");
     }
 
    }
