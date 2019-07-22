@@ -4,7 +4,8 @@ String inputascii = "";
 int one;
 int ten;
 int hundred;
-int start = 47;
+int starty = 47;
+int startx = 47;
 int number;
 void setup()
 {
@@ -18,7 +19,7 @@ void loop()
 {
   if (Serial.available())
   {
-    if(Serial.read() == start)
+    if(Serial.read() == starty)
     {
       for (int i = 0; i < 3; i++)
       {
@@ -44,7 +45,6 @@ void loop()
     if(number == 123)
     {
       PORTD = 1 << led;
-      Serial.write('S');
     }
     if(number == 321)
     {
