@@ -3,13 +3,14 @@
 #pragma region //all variables
 #pragma region //Serial variables
 int led = DD2;
-String inputascii = "";
 int one;
 int ten;
 int hundred;
-int start = 47;
+int datastart = 47;
+int stepstart = 46;
 int xchar = 120;
 int ychar = 121;
+int received = 0;
 #pragma endregion
 
 #pragma region      //x variables
@@ -44,8 +45,9 @@ void loop()
 {
   if (Serial.available())
   {
+    received = Serial.read();
     #pragma region // reading x and y step values from serial connection
-    if (Serial.read() == start)
+    if (received == datastart)
     {
       for (int i = 0; i < 4; i++)
       {
@@ -73,20 +75,8 @@ void loop()
       }
       #pragma endregion
     }
-
-
-
-    if (xsteps == 123)
-    {
-      PORTD = 1 << led;
-      Serial.write('S');
-    }
-    if (xsteps == 321)
-    {
-      PORTD = 0;
-    }
-
-    
+    if(received == stepstart)
+      step(xsteps,ysteps);
   }
 }
 void step(int x, int y)
