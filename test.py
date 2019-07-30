@@ -1,4 +1,6 @@
 import serial
+from time import sleep
+ser = serial.Serial("COM17",115200,timeout = 0)
 step_rev = 200          #steps for nema 17 to complete a revolution
 size = 300              #size of the plotter drawing area
 pulley_diameter = 15    #diameter of the pulley
@@ -12,6 +14,12 @@ x_steps = []
 
 y_coords = []
 y_steps = []
+
+x_dummy = [10,20,10,20]
+y_dummy = [10,20,10,20]
+
+loop = True
+
 thickness = []
 
 data = open("data.txt","r")
@@ -60,4 +68,28 @@ output.write(str(x_steps))
 output.close()
 output = open("ysteps.txt","w")
 output.write(str(y_steps))
-output.close()
+output.close()  
+
+ser.write("test".encode())
+sleep(.1)
+dataout = '/'+str(x_steps[1])+'x'+'/'+str(y_steps[1])+'y.'
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+ser.write(dataout.encode())
+
+
+while loop:
+    inputstring = input()
+    ser.write(inputstring.encode())
+    # for i in y_dummy:               # uncomment to send dummy data for easy testing
+    # #for i in y_steps:              # uncomment to send actual file data
+    #     if 'Next' in str(ser.readline()):
+    #         dataout = '/'+str(x_steps[i])+'x'+'/'+str(y_steps[i])+'y.'
+    #         ser.write(dataout.encode())
+    print(str(ser.readline()))     

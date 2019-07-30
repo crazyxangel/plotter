@@ -9,4 +9,5 @@ while True:
     #     print("banana")
     print(str(ser.readline()))        
     
- 
+
+

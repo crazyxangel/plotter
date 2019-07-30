@@ -2,14 +2,17 @@
 
 #pragma region //all variables
 #pragma region //Serial variables
+
+void step(int x, int y);
+
 int led = DD2;
 int one;
 int ten;
 int hundred;
-int datastart = 47;
-int stepstart = 46;
-int xchar = 120;
-int ychar = 121;
+int datastart = 47; //      /
+int stepstart = 46; //      .
+int xchar = 120;    //      x
+int ychar = 121;    //      y
 int received = 0;
 #pragma endregion
 
@@ -27,7 +30,9 @@ int ydir = DD5;     //the direction pin of the Y axis stepper set to 1 or 0 for 
 int yref = 0;       //reference value to compare with to determine wether or not you have to step left or right
 int deltay = 0;     //value when refferencing ysteps with yref => this value gets send to the step method
 int ysteps = 0;     //Serially received location of the next timeframe in steps
+
 #pragma endregion
+
 
 #pragma endregion
 
@@ -45,6 +50,7 @@ void loop()
 {
   if (Serial.available())
   {
+    delay(1);
     received = Serial.read();
     #pragma region // reading x and y step values from serial connection
     if (received == datastart)
@@ -57,12 +63,35 @@ void loop()
         case 0:
           hundred = Serial.read();
           break;
-        case 1:
+
+        case 1:        
           ten = Serial.read();
+          if (ten == xchar)
+          {
+            xsteps = (hundred - 48);
+            i = 4;
+          }
+          if (ten == ychar)
+          {
+            ysteps = (hundred - 48);
+            i = 4;
+          }
           break;
+
         case 2:
           one = Serial.read();
+          if (one == xchar)
+          {
+            xsteps = (hundred - 48) * 10 + (ten - 48);
+            i = 4;
+          }
+          if (one == ychar)
+          {
+            ysteps = (hundred - 48) * 10 + (ten - 48);
+            i = 4;
+          }
           break;
+
         case 3:
           if (Serial.read() == xchar)
             xsteps = (hundred - 48) * 100 + (ten - 48) * 10 + one - 48;
@@ -76,7 +105,10 @@ void loop()
       #pragma endregion
     }
     if(received == stepstart)
+    {
       step(xsteps,ysteps);
+      Serial.write("Next");
+    }
   }
 }
 void step(int x, int y)

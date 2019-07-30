@@ -25,6 +25,7 @@ void loop()
   {
     if(Serial.read() == start)
     {
+      Serial.write("396");
       for (int i = 0; i < 4; i++)
       {
         delay(1);
