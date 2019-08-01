@@ -9,6 +9,8 @@ factor = size/100       #factor to translate the coordinates which are in % to t
 mm_rev = pulley_diameter*3.14
 mmstep = mm_rev/step_rev/100
 
+log = []
+
 x_coords = []
 x_steps = []
 
@@ -71,25 +73,30 @@ output.write(str(y_steps))
 output.close()  
 
 ser.write("test".encode())
-sleep(.1)
-dataout = '/'+str(x_steps[1])+'x'+'/'+str(y_steps[1])+'y.'
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
-ser.write(dataout.encode())
+response = str(ser.readline())
+while 'Ready' not in response:
+    response = str(ser.readline())
 
+print("ready")
+dataout = '/'+str(x_steps[0])+'x'+'/'+str(y_steps[0])+'y.'
+# dataout = '/'+str(x_dummy[0])+'x'+'/'+str(y_dummy[0])+'y.'
 
+ser.write(dataout.encode())
+i = 0
+prev = ''
 while loop:
-    inputstring = input()
-    ser.write(inputstring.encode())
-    # for i in y_dummy:               # uncomment to send dummy data for easy testing
-    # #for i in y_steps:              # uncomment to send actual file data
-    #     if 'Next' in str(ser.readline()):
-    #         dataout = '/'+str(x_steps[i])+'x'+'/'+str(y_steps[i])+'y.'
-    #         ser.write(dataout.encode())
-    print(str(ser.readline()))     
+    # inputstring = input()
+    # ser.write(inputstring.encode())
+    # while i < len(y_dummy):           # uncomment to send dummy data for easy testing
+    while i <= len(y_steps):           # uncomment to send actual file data
+        response = str(ser.readline())
+        sleep(.010)
+        if response != prev :
+            print(response)
+            prev = response
+        if 'N' in response:
+            dataout = '/'+str(x_steps[i])+'x'+'/'+str(y_steps[i])+'y.'
+            # dataout = '/'+str(x_dummy[i])+'x'+'/'+str(y_dummy[i])+'y.'
+            print(dataout)
+            ser.write(dataout.encode())
+            i += 1

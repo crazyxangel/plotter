@@ -9,6 +9,8 @@ int led = DD2;
 int one;
 int ten;
 int hundred;
+int thousand;
+int xory;
 int datastart = 47; //      /
 int stepstart = 46; //      .
 int xchar = 120;    //      x
@@ -55,48 +57,63 @@ void loop()
     #pragma region // reading x and y step values from serial connection
     if (received == datastart)
     {
-      for (int i = 0; i < 4; i++)
+      for (int i = 0; i < 5; i++)
       {
         delay(1);
         switch (i)
         {
         case 0:
-          hundred = Serial.read();
+          thousand = Serial.read();
           break;
 
-        case 1:        
+        case 1:
+          hundred = Serial.read();
+          if (hundred == xchar)
+          {
+            xsteps = (thousand - 48);
+            i = 5;
+          }
+          if (hundred == ychar)
+          {
+            ysteps = (thousand - 48);
+            i = 5;
+          }
+          break;
+
+        case 2:        
           ten = Serial.read();
           if (ten == xchar)
           {
-            xsteps = (hundred - 48);
-            i = 4;
+            xsteps = (thousand - 48) * 10 + (hundred - 48);
+            i = 5;
           }
           if (ten == ychar)
           {
-            ysteps = (hundred - 48);
-            i = 4;
-          }
-          break;
-
-        case 2:
-          one = Serial.read();
-          if (one == xchar)
-          {
-            xsteps = (hundred - 48) * 10 + (ten - 48);
-            i = 4;
-          }
-          if (one == ychar)
-          {
-            ysteps = (hundred - 48) * 10 + (ten - 48);
-            i = 4;
+            ysteps = (thousand - 48) * 10 + (hundred - 48);
+            i = 5;
           }
           break;
 
         case 3:
-          if (Serial.read() == xchar)
-            xsteps = (hundred - 48) * 100 + (ten - 48) * 10 + one - 48;
-          if (Serial.read() == ychar)
-            ysteps = (hundred - 48) * 100 + (ten - 48) * 10 + one - 48;
+          one = Serial.read();
+          if (one == xchar)
+          {
+            xsteps = (thousand - 48) * 100 + (hundred - 48) * 10 + (ten - 48);
+            i = 5;
+          }
+          if (one == ychar)
+          {
+            ysteps = (thousand - 48) * 100 + (hundred - 48) * 10 + (ten - 48);
+            i = 5;
+          }
+          break;
+
+        case 4:
+        xory = Serial.read();
+          if (xory == xchar)
+            xsteps = (thousand - 48) * 1000 + (hundred - 48) * 100 + (ten - 48) * 10 + (one - 48);
+          if (xory == ychar)
+            ysteps = (thousand - 48) * 1000 + (hundred - 48) * 100 + (ten - 48) * 10 + (one - 48);
 
         default:
           break;
@@ -106,8 +123,15 @@ void loop()
     }
     if(received == stepstart)
     {
-      step(xsteps,ysteps);
-      Serial.write("Next");
+      deltax = xsteps - xref;
+      deltay = ysteps - yref;
+      xref = xsteps;
+      yref = ysteps;
+      Serial.println("xsteps= " +String(xsteps)+ "xref= " + String(xref) + "ysteps= " +String(ysteps)+ "yref= " + String(yref));
+      
+      Serial.print("deltax= " + String(deltax) + "deltay= " + String(deltay));
+      step(deltax,deltay);
+      Serial.write('N');
     }
   }
 }
@@ -135,15 +159,15 @@ void step(int x, int y)
   {
     if (x > 0)
     {
-      Serial.println("x ");
-      Serial.println(x);
+      // Serial.println("x ");
+      // Serial.println(x);
       PORTD |= 1 << stepperx;
       x--;
     }
     if (y > 0)
     {
-      Serial.println("y ");
-      Serial.println(y);
+      // Serial.println("y ");
+      // Serial.println(y);
       PORTD |= 1 << steppery;
       y--;
     }
