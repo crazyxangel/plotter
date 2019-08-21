@@ -6,15 +6,21 @@
 void step(int x, int y);
 
 int led = DD2;
+
+//variables used to combine digits into their original number
 int one;
 int ten;
 int hundred;
 int thousand;
+
 int xory;
+
+//ascii code of important characters
 int datastart = 47; //      /
 int stepstart = 46; //      .
 int xchar = 120;    //      x
 int ychar = 121;    //      y
+
 int received = 0;
 #pragma endregion
 
@@ -41,7 +47,8 @@ int ysteps = 0;     //Serially received location of the next timeframe in steps
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Ready");
+  Serial.println("Ready");  //prints ready on the serial connection to let the computer know its ready to receive its first coordinates
+  //sets the data direction of the output pins on the D registers
   DDRD |= 1 << stepperx;
   DDRD |= 1 << xdir;
   DDRD |= 1 << steppery;
@@ -123,15 +130,17 @@ void loop()
     }
     if(received == stepstart)
     {
+      //updates the current position and the reference
       deltax = xsteps - xref;
       deltay = ysteps - yref;
       xref = xsteps;
       yref = ysteps;
-      Serial.println("xsteps= " +String(xsteps)+ "xref= " + String(xref) + "ysteps= " +String(ysteps)+ "yref= " + String(yref));
+
+      Serial.println("xsteps= " +String(xsteps)+ "xref= " + String(xref) + "ysteps= " +String(ysteps)+ "yref= " + String(yref)); //string send back for debug purposes
       
-      Serial.print("deltax= " + String(deltax) + "deltay= " + String(deltay));
-      step(deltax,deltay);
-      Serial.write('N');
+      Serial.print("deltax= " + String(deltax) + "deltay= " + String(deltay)); //string send back for debug purposes
+      step(deltax,deltay); //calls the step method to start rotating the stepper motors
+      Serial.write('N'); // writes 'N' to the computer to indicate its ready for its next coordinate set
     }
   }
 }
